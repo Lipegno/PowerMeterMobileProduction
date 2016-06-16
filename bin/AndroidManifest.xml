@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.sinais.mobile"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="10" />
+        <uses-permission android:name="android.permission.VIBRATE"/>
+   		<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+   		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+   		<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="Power Meter Mobile" >
+        <activity
+            android:name=".mainActivities.PowerMeterMobileActivity"
+            android:label="Power Meter Mobile" android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".mainActivities.DayConsumptionActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".mainActivities.WeekConsumptionActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".mainActivities.MonthConsumptionActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".mainActivities.EventChartActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".mainActivities.ScreenSaverAct" android:screenOrientation="landscape"></activity>
+        <activity android:name=".mainActivities.AnimationActivity" android:screenOrientation="landscape"></activity>
+        <service android:name=".services.SocketConnectionService"></service>
+        <service android:name=".services.EventsSocketService"></service>
+        <activity android:name=".preferences.ApplicationSettings"></activity>
+        <activity android:name=".mainActivities.EventDisplayActitivy"></activity>
+        <activity android:name=".mainActivities.ProductionActivity" android:screenOrientation="landscape"></activity>
+    </application>
+
+</manifest>

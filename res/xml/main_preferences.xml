@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Application Preferences" >
+
+    <!-- Sets up general preferences -->
+    <PreferenceCategory android:title="General Preferences" >
+        <EditTextPreference
+            android:defaultValue="1"
+            android:enabled="true"
+            android:key="installation_ID"
+            android:summary="Installation id of the household"
+            android:title="Installation ID" />
+        <EditTextPreference
+            android:defaultValue="11"
+            android:enabled="true"
+            android:key="socket_port"
+            android:summary="last digits of the socket port used to gather real time information (ex: 999X)"
+            android:title="Socket Port" />
+
+        <ListPreference
+            android:defaultValue="Normal"
+            android:entries="@array/cons_level_labels"
+            android:entryValues="@array/cons_level_values"
+            android:key="average_house_consumption"
+            android:summary="Is this a high, normal or low consumption household"
+            android:title="Average household Consumption:" >
+        </ListPreference>
+        <ListPreference
+            android:defaultValue="Normal"
+            android:entries="@array/min_event_label"
+            android:entryValues="@array/min_event_values"
+            android:key="min_events"
+            android:summary="Do you want the system to detect events starting in:"
+            android:title="Minimum appliance detection:" >
+        </ListPreference>
+
+        <EditTextPreference
+            android:defaultValue="213.190.214.27"
+            android:enabled="true"
+            android:key="meter_ip"
+            android:summary="Insert the IP adress of your meter, so the application can fetch the current consumption"
+            android:title="PowerMeter&apos;s IP adress" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="art_eco"
+            android:summary="is the landscape ecofeedback enabled in this system"
+            android:title="landscape" >
+        </CheckBoxPreference>
+
+        <ListPreference
+            android:defaultValue="2500"
+            android:entries="@array/max_event_values"
+            android:entryValues="@array/max_event_values"
+            android:key="max_event_chart"
+            android:summary="The maximum event delta to be displayed in the chart"
+            android:title="Events Chart Max" >
+        </ListPreference>
+
+        <EditTextPreference
+            android:defaultValue="81"
+            android:key="webserver_port"
+            android:summary="Please insert the port of webserver"
+            android:title="Webserver port" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

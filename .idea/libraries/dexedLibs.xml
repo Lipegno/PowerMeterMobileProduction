@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="dexedLibs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/annotations-24f35fdd52f03ec792478e3d3d8bee9c.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/Androidplot-core-0.4.4-release-15f0cfe99b5fe2a5fb375637d8dcd17d.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
