@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="installation">26</string>
+   	<string name="app_bottom_info">Built 30/08/2011 Copyright (c) 2011 Madeira-ITI</string>
+	<string name="home_tab_name">home</string>
+	<!-- Household consumption levels obptions -->
+	<string-array
+		name="cons_level_labels">
+		<item>Low</item>
+		<item>Normal</item>
+		<item>High</item>
+	</string-array>
+	<string-array
+		name="cons_level_values">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+	</string-array>
+	<string-array
+		name="min_event_label">
+		<item>Low (25W)</item>
+		<item>Normal (150W)</item>
+		<item>High (250W)</item>
+	</string-array>
+	<string-array
+		name="min_event_values">
+		<item>25</item>
+		<item>150</item>
+		<item>250</item>
+	</string-array>
+	<string-array
+		name="max_event_values">
+		<item>1000</item>
+		<item>2500</item>
+		<item>4500</item>
+	</string-array>
+	<string name="euro">€</string>
+</resources>

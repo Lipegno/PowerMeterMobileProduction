@@ -1,35 +1,40 @@
 package org.sinais.mobile.custom.productionChart;
 
-import org.sinais.mobile.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import org.sinais.mobile.R;
+
 public class SummaryComparisonWidget  extends SurfaceView implements SurfaceHolder.Callback{
 	
-	private int maxDailyCons;
-	private int maxWeeklyCons;
-	private int maxMonthlyCons;
-	private float daily_cons;
-	private float daily_avg;
-	private float weekly_cons;
-	private float weekly_avg;
-	private float monthly_cons;
-	private float monthly_avg;
+	private int _maxDailyCons;
+	private int _maxWeeklyCons;
+	private int _maxMonthlyCons;
+	private float _daily_cons;
+	private float _daily_avg;
+	private float _weekly_cons;
+	private float _weekly_avg;
+	private float _monthly_cons;
+	private float _monthly_avg;
+
+	private int _comparisonBarHeight = 30;
+
+
 	private static final String MODULE = "Summary Comparison Widget";
 
 
 	public SummaryComparisonWidget(Context context,AttributeSet attrs) {
-		super(context,attrs);
+		super(context, attrs);
 		getHolder().addCallback(this);
 		// TODO Auto-generated constructor stub
 	}
@@ -50,9 +55,9 @@ public class SummaryComparisonWidget  extends SurfaceView implements SurfaceHold
 		textPaint.setTextSize(22);
 		textPaint.setAntiAlias(true);
 		c.drawLine(w/2, starY, w/2, h,textPaint);
-		drawComparison(starY+35, c, daily_cons, daily_avg, getMaxDailyCons(),"Ontem "," Hoje");
-		drawComparison(starY+90, c, weekly_cons, weekly_avg, getMaxWeeklyCons(),"Semana passada "," Esta semana ");
-		drawComparison(starY+145, c, monthly_cons, monthly_avg, getMaxMonthlyCons(),"Mês passado "," Este Mês");
+		drawComparison(starY+35, c, _daily_cons, _daily_avg, get_maxDailyCons(),"Ontem "," Hoje");
+		drawComparison(starY + 90, c, _weekly_cons, _weekly_avg, get_maxWeeklyCons(), "Semana passada ", " Esta semana ");
+		drawComparison(starY + 145, c, _monthly_cons, _monthly_avg, get_maxMonthlyCons(), "Mês passado ", " Este Mês");
 	}
 	private int calculateBarWidth(float avg,float max){
 		return Math.round((avg*getWidth()/2)/max);
@@ -60,39 +65,55 @@ public class SummaryComparisonWidget  extends SurfaceView implements SurfaceHold
 	private void drawComparison(int y,Canvas c,float cons, float avg, float max, String period1, String period2){
 			
 		int cons_width = calculateBarWidth(cons,max);
-		Log.e(MODULE , "cons width "+cons_width);
 		int avg_width  = calculateBarWidth(avg,max);
-		Log.e(MODULE, "avg width "+avg_width);
 		Paint p = new Paint();
 		Paint p2 = new Paint();
 		Paint textPaint = new Paint();
 		textPaint.setTextSize(15);
 		textPaint.setAntiAlias(true);
 
-		p.setColor(Color.parseColor("#B3B3B3"));
+		p.setColor(getResources().getColor(R.color.app_main));
 		p.setAntiAlias(true);
-		p2.setColor(Color.parseColor("#F0492D"));
+		p2.setColor(getResources().getColor(R.color.app_main_dark));
 		p2.setAntiAlias(true);
 		float w = getWidth();
 		int middle = (int)(w/2);
 		
-		Rect r  = new Rect(middle - avg_width, y,middle,y+30);
-		float textx = textPaint.measureText(period1);
-    	c.drawText(period1,(w/2)-textx, y-5, textPaint);
+		Rect r  = new Rect(middle - avg_width, y,middle,y+_comparisonBarHeight);
+		float text = textPaint.measureText(period1);
+    	c.drawText(period1, (w / 2) - text, y - 5, textPaint);
 		c.drawRect(r, p);
-		c.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.left_tip), middle - avg_width, y, p);
-		
-    	Rect r2 = new Rect(middle, y,middle+cons_width,y+30);
-    	textx = textPaint.measureText(cons+"");
-    	float tx = (middle+cons_width-textx) > middle ? (middle+cons_width-textx) : middle;
+		//c.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.left_tip), middle - avg_width, y, p);
+		drawTriangle(false,c,middle - avg_width,y,p);
+    	Rect r2 = new Rect(middle, y,middle+cons_width,y+_comparisonBarHeight);
+    	text = textPaint.measureText(cons+"");
+    	float tx = (middle+cons_width-text) > middle ? (middle+cons_width-text) : middle;
     	
-		c.drawText(period2,w/2, y-5, textPaint);
+		c.drawText(period2, w / 2, y - 5, textPaint);
 		c.drawRect(r2, p2);
-		c.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.right_tip),middle+cons_width, y, p);
-		textx = textPaint.measureText(cons+"");
+		//c.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.right_tip),middle+cons_width, y, p);
+		drawTriangle(true, c, middle + cons_width, y, p2);
 		p2.setColor(Color.WHITE);
 		c.drawText(cons+"", tx, y+18, p2);
 
+	}
+	private void drawTriangle(boolean orientation, Canvas c, int x, int y,Paint p){
+		Point point1_draw = new Point(x, y);
+		Point point3_draw = new Point(x, y + _comparisonBarHeight);
+		Point point2_draw;
+		if(orientation)
+			point2_draw = new Point(x+10,y+_comparisonBarHeight/2);
+		else
+			point2_draw = new Point(x-10,y+_comparisonBarHeight/2);
+
+		Path path = new Path();
+		path.setFillType(Path.FillType.EVEN_ODD);
+		path.moveTo(point1_draw.x,point1_draw.y);
+		path.lineTo(point2_draw.x,point2_draw.y);
+		path.lineTo(point3_draw.x,point3_draw.y);
+		path.lineTo(point1_draw.x,point1_draw.y);
+		path.close();
+		c.drawPath(path, p);
 	}
 	@SuppressLint("WrongCall")
 	public void requestRender(){
@@ -135,75 +156,53 @@ public class SummaryComparisonWidget  extends SurfaceView implements SurfaceHold
 		
 	}
 
-	public int getMaxDailyCons() {
-		return maxDailyCons;
+	public int get_maxDailyCons() {
+		return _maxDailyCons;
 	}
 
-	public void setMaxDailyCons(int maxDailyCons) {
-		this.maxDailyCons = maxDailyCons;
+	public void set_maxDailyCons(int _maxDailyCons) {
+		this._maxDailyCons = _maxDailyCons;
 	}
 
-	public int getMaxWeeklyCons() {
-		return maxWeeklyCons;
+	public int get_maxWeeklyCons() {
+		return _maxWeeklyCons;
 	}
 
-	public void setMaxWeeklyCons(int maxWeeklyCons) {
-		this.maxWeeklyCons = maxWeeklyCons;
+	public void set_maxWeeklyCons(int _maxWeeklyCons) {
+		this._maxWeeklyCons = _maxWeeklyCons;
 	}
 
-	public int getMaxMonthlyCons() {
-		return maxMonthlyCons;
+	public int get_maxMonthlyCons() {
+		return _maxMonthlyCons;
 	}
 
-	public void setMaxMonthlyCons(int maxMonthlyCons) {
-		this.maxMonthlyCons = maxMonthlyCons;
+	public void set_maxMonthlyCons(int _maxMonthlyCons) {
+		this._maxMonthlyCons = _maxMonthlyCons;
 	}
 
-	public float getDaily_cons() {
-		return daily_cons;
+
+	public void set_daily_cons(float _daily_cons) {
+		this._daily_cons = _daily_cons;
 	}
 
-	public void setDaily_cons(float daily_cons) {
-		this.daily_cons = daily_cons;
+
+	public void setYesterday_con(float daily_avg) {
+		this._daily_avg = daily_avg;
 	}
 
-	public float getDaily_avg() {
-		return daily_avg;
+	public void set_weekly_cons(float _weekly_cons) {
+		this._weekly_cons = _weekly_cons;
 	}
 
-	public void setDaily_avg(float daily_avg) {
-		this.daily_avg = daily_avg;
+	public void setLastWeek_cons(float weekly_avg) {
+		this._weekly_avg = weekly_avg;
 	}
 
-	public float getWeekly_cons() {
-		return weekly_cons;
+	public void set_monthly_cons(float _monthly_cons) {
+		this._monthly_cons = _monthly_cons;
 	}
 
-	public void setWeekly_cons(float weekly_cons) {
-		this.weekly_cons = weekly_cons;
-	}
-
-	public float getWeekly_avg() {
-		return weekly_avg;
-	}
-
-	public void setWeekly_avg(float weekly_avg) {
-		this.weekly_avg = weekly_avg;
-	}
-
-	public float getMonthly_cons() {
-		return monthly_cons;
-	}
-
-	public void setMonthly_cons(float monthly_cons) {
-		this.monthly_cons = monthly_cons;
-	}
-
-	public float getMonthly_avg() {
-		return monthly_avg;
-	}
-
-	public void setMonthly_avg(float monthly_avg) {
-		this.monthly_avg = monthly_avg;
+	public void setLastMonth_cons(float monthly_avg) {
+		this._monthly_avg = monthly_avg;
 	}
 }

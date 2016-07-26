@@ -2,6 +2,7 @@ package org.sinais.mobile.custom.productionChart;
 
 import java.text.DecimalFormat;
 
+import org.sinais.mobile.R;
 import org.sinais.mobile.storage.DBManager;
 
 import android.annotation.SuppressLint;
@@ -9,7 +10,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -17,18 +17,20 @@ import android.view.SurfaceView;
 
 public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback{
 	
-	private float total_month;
-	private float total_week;
-	private float total_day;
-	String color_month = "#F15638";
-	String color_week  = "#C95745";
-	String color_day   = "#772C16";
+	private float _total_month;
+	private float _total_week;
+	private float _total_day;
+	int _color_month;
+	int _color_week;
+	int _color_day;
 	private final static String MODULE = "Summary widget";
 
 	public SummaryWidget(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		getHolder().addCallback(this);
-		// TODO Auto-generated constructor stub
+		_color_month = getResources().getColor(R.color.app_main_darker);
+		_color_week = getResources().getColor(R.color.app_main_dark);
+		_color_day   = getResources().getColor(R.color.app_main);
 	}
 	@SuppressLint("WrongCall")
 	public void requestRender(){
@@ -54,24 +56,24 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 		float h = getHeight();
 
 		float r0 = (int) Math.round(h/2.3);
-		float r1 = calculateRadious(total_month,r0);//(total_month*r0)/max_cons;
-		float r2 = calculateRadious(total_week,r0);//(total_week*r0)/max_cons;
-		float r3 = calculateRadious(total_day,r0);//(total_day*r0)/max_cons;
+		float r1 = calculateRadious(_total_month,r0);//(_total_month*r0)/max_cons;
+		float r2 = calculateRadious(_total_week,r0);//(_total_week*r0)/max_cons;
+		float r3 = calculateRadious(_total_day,r0);//(_total_day*r0)/max_cons;
 		Log.i(MODULE,"radious: month"+r1+" week"+r2+" day"+r3);
 		
 		Paint paint_month = new Paint();
-		paint_month.setColor(Color.parseColor(color_month));
+		paint_month.setColor(_color_month);
 		paint_month.setAntiAlias(true);
 		
 		Paint paint_week = new Paint();
-		paint_week.setColor(Color.parseColor(color_week));
+		paint_week.setColor(_color_week);
 		paint_week.setAntiAlias(true);
 		
 		Paint paint_day = new Paint();
-		paint_day.setColor(Color.parseColor(color_day));
+		paint_day.setColor(_color_day);
 		paint_day.setAntiAlias(true);
 		
-		if( total_month>total_week ){
+		if( _total_month > _total_week){
 			c.drawCircle(w/2, h/2, r1, paint_month);
 			c.drawCircle(w/2, h/2, r2, paint_week);
 		}else{
@@ -123,26 +125,26 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		p.setTextSize(13);
-		double co2Month = (total_month)*0.762; 
+		double co2Month = (_total_month)*0.762;
 		co2Month = co2Month - co2Month*DBManager.getDBManager().getThisMonthRenewPrecentage();
-		double co2Week = (total_week)*0.762; 
+		double co2Week = (_total_week)*0.762;
 		co2Week = co2Week - co2Week*DBManager.getDBManager().getThisWeekRenewPercentage();
-		double co2Day = (total_week)*0.762; 
+		double co2Day = (_total_week)*0.762;
 		co2Day = co2Day - co2Day*DBManager.getDBManager().getTodayRenewPrecentage();
 		
-		if(total_month>total_week){
-			p.setColor(Color.parseColor(color_month));
-			drawAverage(c,month_x+10,month_y,total_month,co2Month,p);
-			p.setColor(Color.parseColor(color_week));
-			drawAverage(c,week_x+10,week_y,total_week,co2Week,p);
+		if(_total_month > _total_week){
+			p.setColor(_color_month);
+			drawAverage(c,month_x+10,month_y, _total_month,co2Month,p);
+			p.setColor(_color_week);
+			drawAverage(c,week_x+10,week_y, _total_week,co2Week,p);
 		}else{
-			p.setColor(Color.parseColor(color_week));
-			drawAverage(c,month_x+10,month_y,total_week,co2Week,p);
-			p.setColor(Color.parseColor(color_month));
-			drawAverage(c,week_x+10,week_y,total_month,co2Month,p);
+			p.setColor(_color_week);
+			drawAverage(c,month_x+10,month_y, _total_week,co2Week,p);
+			p.setColor(_color_month);
+			drawAverage(c,week_x+10,week_y, _total_month,co2Month,p);
 		}
-		p.setColor(Color.parseColor(color_day));
-		drawAverage(c,day_x+10,day_y,total_day,co2Day,p);
+		p.setColor(_color_day);
+		drawAverage(c,day_x+10,day_y, _total_day,co2Day,p);
 	}
 	private void drawAverage(Canvas c, float x, float y,float val,double co2,Paint p){
 		DecimalFormat df = new DecimalFormat("#.#");
@@ -164,7 +166,7 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 
 	}
 	private float calculateRadious(float cons, float max_r){
-		float max_cons = total_month>total_week?total_month:total_week;
+		float max_cons = _total_month > _total_week ? _total_month : _total_week;
 		float result = 0f;
 		result = (cons*max_r)/max_cons;
 		double dat_data = (Math.log((cons/max_cons)));
@@ -175,7 +177,7 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 	public void onDraw(Canvas c){
 		if(c!=null){
 			c.drawColor(Color.parseColor("#FFFFFF"));
-			if(total_day!=0){
+			if(_total_day !=0){
 				drawComp(c);
 				drawLegend(c);
 				drawDescription(c);
@@ -191,15 +193,15 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 		p.setAntiAlias(true);
 		p.setTextSize(10);
 		
-		p.setColor(Color.parseColor(color_month));
+		p.setColor(_color_month);
 		c.drawRect(x, getHeight()-40, 10, getHeight()-30, p);
 		c.drawText("Mês", 15,  getHeight()-30, p);
 		
-		p.setColor(Color.parseColor(color_week));
+		p.setColor(_color_week);
 		c.drawRect(x, getHeight()-25, 10, getHeight()-15, p);
 		c.drawText("Semana", 15,  getHeight()-15, p);
 		
-		p.setColor(Color.parseColor(color_day));
+		p.setColor(_color_day);
 		c.drawRect(x, getHeight()-10, 10, getHeight(), p);
 		c.drawText("Hoje", 15,  getHeight(), p);
 		
@@ -210,7 +212,8 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 		Paint p = new Paint();
 		p.setTextSize(15);
 		p.setAntiAlias(true);
-		p.setColor(Color.parseColor("#F15638"));
+
+		p.setColor(getResources().getColor(R.color.app_main));
 		c.drawText("Loading consumption data...", x-p.measureText("Loading consumption data..."), y, p);
 	}
 	@Override
@@ -221,32 +224,30 @@ public class SummaryWidget extends SurfaceView implements SurfaceHolder.Callback
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
 		requestRender();
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
+
 	}
-	public float getTotal_month() {
-		return total_month;
+	public float get_total_month() {
+		return _total_month;
 	}
-	public void setTotal_month(float total_month) {
-		this.total_month = total_month;
+	public void set_total_month(float _total_month) {
+		this._total_month = _total_month;
 	}
-	public float getTotal_week() {
-		return total_week;
+	public float get_total_week() {
+		return _total_week;
 	}
-	public void setTotal_week(float total_week) {
-		this.total_week = total_week;
+	public void set_total_week(float _total_week) {
+		this._total_week = _total_week;
 	}
-	public float getTotal_day() {
-		return total_day;
+	public float get_total_day() {
+		return _total_day;
 	}
-	public void setTotal_day(float total_day) {
-		this.total_day = total_day;
+	public void set_total_day(float _total_day) {
+		this._total_day = _total_day;
 	}
 
 }

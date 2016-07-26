@@ -1,24 +1,6 @@
 package org.sinais.mobile.mainActivities;
 
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.sinais.mobile.R;
-import org.sinais.mobile.custom.productionChart.SummaryComparisonWidget;
-import org.sinais.mobile.custom.productionChart.SummaryWidget;
-import org.sinais.mobile.custom.ui_handler.TabbedMenuHandler;
-import org.sinais.mobile.misc.EventSampleDTO;
-import org.sinais.mobile.misc.RuntimeConfigs;
-import org.sinais.mobile.preferences.ApplicationSettings;
-import org.sinais.mobile.services.EventsSocketService;
-import org.sinais.mobile.services.SocketConnectionService;
-import org.sinais.mobile.storage.DBManager;
-import org.sinais.mobile.webservicesHandlers.WebServiceHandler;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -46,6 +28,23 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.sinais.mobile.R;
+import org.sinais.mobile.custom.productionChart.SummaryComparisonWidget;
+import org.sinais.mobile.custom.productionChart.SummaryWidget;
+import org.sinais.mobile.custom.ui_handler.TabbedMenuHandler;
+import org.sinais.mobile.misc.EventSampleDTO;
+import org.sinais.mobile.misc.RuntimeConfigs;
+import org.sinais.mobile.preferences.ApplicationSettings;
+import org.sinais.mobile.services.EventsSocketService;
+import org.sinais.mobile.services.SocketConnectionService;
+import org.sinais.mobile.storage.DBManager;
+import org.sinais.mobile.webservicesHandlers.WebServiceHandler;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
 public class PowerMeterMobileActivity extends Activity implements Observer {
 
 	private LinearLayout _dayBtn;
@@ -53,14 +52,14 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 	private LinearLayout _monthBtn;
 	private LinearLayout _prodBtn;
 
-	private TextView _compDay;
+	/*private TextView _compDay;
 	private TextView _compWeek;
 	private TextView _compTMonth;
 
 
 	private TextView _todayTotal;
 	private TextView _weekTotal;
-	private TextView _monthTotal;
+	private TextView _monthTotal;*/
 
 	private LinearLayout _connectionStatusIcon;
 
@@ -112,7 +111,7 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 	private RuntimeConfigs _configs;
 	public ContentValues agg_data;
 	private UI_Handler _handler;
-	private SummaryWidget _comp; 
+	//private SummaryWidget _comp;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -159,8 +158,8 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 	@Override
 	public void onStart(){
 		super.onStart();
-		powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
-		wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "PowerMeterMobile");
+//		powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+//		wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP, "PowerMeterMobile");
 		Runtime.getRuntime().gc();
 	}
 	@Override 
@@ -178,7 +177,7 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 		test.execute("init");
 		_summaryComp			= (SummaryComparisonWidget)findViewById(R.id.summaryCompWidget);
 		_summaryWidget			= (SummaryWidget)findViewById(R.id.summaryWidget);
-		_comp					= (SummaryWidget)findViewById(R.id.summaryWidget);
+		//_comp					= (SummaryWidget)findViewById(R.id.summaryWidget);
 		_dayBtn    				= (LinearLayout)findViewById(R.id.today_btn);
 		_weekBtn   				= (LinearLayout)findViewById(R.id.week_btn);
 		_monthBtn 				= (LinearLayout)findViewById(R.id.month_btn);
@@ -195,15 +194,15 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 		_resetButton			= (Button)findViewById(R.id.reset_connection);
 		
 		// dummy init
-		_summaryComp.setMaxDailyCons(50);
-		_summaryComp.setMaxWeeklyCons(50);
-		_summaryComp.setMaxMonthlyCons(50);
-		_summaryComp.setDaily_avg(0);
-		_summaryComp.setDaily_cons(0);
-		_summaryComp.setWeekly_avg(0);
-		_summaryComp.setWeekly_cons(0);
-		_summaryComp.setMonthly_avg(0);
-		_summaryComp.setMonthly_cons(0);
+		_summaryComp.set_maxDailyCons(50);
+		_summaryComp.set_maxWeeklyCons(50);
+		_summaryComp.set_maxMonthlyCons(50);
+		_summaryComp.setYesterday_con(10);
+		_summaryComp.set_daily_cons(15);
+		_summaryComp.setLastWeek_cons(30);
+		_summaryComp.set_weekly_cons(20);
+		_summaryComp.setLastMonth_cons(40);
+		_summaryComp.set_monthly_cons(50);
 		
 //		_compDay				= (TextView)findViewById(R.id.day_comparisonBox_main);
 //		_compWeek				= (TextView)findViewById(R.id.week_comparisonBox_main);
@@ -351,31 +350,53 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 		Log.e(MODULE, "total "+today_cons_total+" avg "+yesterday_cons_total);
 		Log.e(MODULE, "total "+week_cons_total+" avg "+last_week_cons_total);
 		Log.e(MODULE, "total "+month_cons_total+" avg "+last_month_cons_total);
+
 		//dummy init
-		_summaryWidget.setTotal_month(Math.round(month_cons_total)/1000);
-		_summaryWidget.setTotal_week(Math.round(week_cons_total)/1000);
+	/*	_summaryWidget.set_total_month(Math.round(month_cons_total)/1000);
+		_summaryWidget.set_total_week(Math.round(week_cons_total)/1000);
 		double val = (today_cons_total)/1000;
 		if(val>1)
-			_summaryWidget.setTotal_day(Math.round(today_cons_total)/1000);
+			_summaryWidget.set_total_day(Math.round(today_cons_total)/1000);
 		else
-			_summaryWidget.setTotal_day(1);
+			_summaryWidget.set_total_day(1);
 		
+		_summaryWidget.requestRender();*/
+
+
+		//dummy init
+		_summaryWidget.set_total_month(30);
+		_summaryWidget.set_total_week(10);
+		_summaryWidget.set_total_day(5);
 		_summaryWidget.requestRender();
-		int max_daily = Math.round(yesterday_cons_total)/1000 > Math.round(today_cons_total)/1000 ? (int)Math.round((Math.round(yesterday_cons_total)/1000)*1.3) : (int)Math.round((Math.round(today_cons_total)/1000)*1.3);
+
+	/*	int max_daily = Math.round(yesterday_cons_total)/1000 > Math.round(today_cons_total)/1000 ? (int)Math.round((Math.round(yesterday_cons_total)/1000)*1.3) : (int)Math.round((Math.round(today_cons_total)/1000)*1.3);
 		int max_weekly = Math.round(last_week_cons_total)/1000 > Math.round(week_cons_total)/1000 ? (int)Math.round((Math.round(last_week_cons_total)/1000)*1.3) : (int)Math.round((Math.round(week_cons_total)/1000)*1.3);
 		int max_monthly = Math.round(last_month_cons_total)/1000 > Math.round(month_cons_total)/1000 ? (int)Math.round((Math.round(last_month_cons_total)/1000)*1.3) : (int)Math.round((Math.round(month_cons_total)/1000)*1.3);
-		_summaryComp.setMaxDailyCons(max_daily);
-		_summaryComp.setMaxWeeklyCons(max_weekly);
-		_summaryComp.setMaxMonthlyCons(max_monthly);
+		_summaryComp.set_maxDailyCons(max_daily);
+		_summaryComp.set_maxWeeklyCons(max_weekly);
+		_summaryComp.set_maxMonthlyCons(max_monthly);
+
+		_summaryComp.setYesterday_con(Math.round(yesterday_cons_total)/1000);
+		_summaryComp.set_daily_cons(Math.round(today_cons_total)/1000);
 		
-		_summaryComp.setDaily_avg(Math.round(yesterday_cons_total)/1000);
-		_summaryComp.setDaily_cons(Math.round(today_cons_total)/1000);
+		_summaryComp.setLastWeek_cons(Math.round(last_week_cons_total)/1000);
+		_summaryComp.set_weekly_cons(Math.round(week_cons_total)/1000);
 		
-		_summaryComp.setWeekly_avg(Math.round(last_week_cons_total)/1000);
-		_summaryComp.setWeekly_cons(Math.round(week_cons_total)/1000);
-		
-		_summaryComp.setMonthly_avg(Math.round(last_month_cons_total)/1000);
-		_summaryComp.setMonthly_cons(Math.round(month_cons_total)/1000);
+		_summaryComp.setLastMonth_cons(Math.round(last_month_cons_total)/1000);
+		_summaryComp.set_monthly_cons(Math.round(month_cons_total)/1000);*/
+
+		_summaryComp.set_maxDailyCons(8);
+		_summaryComp.set_maxWeeklyCons(20);
+		_summaryComp.set_maxMonthlyCons(50);
+
+		_summaryComp.setYesterday_con(3);
+		_summaryComp.set_daily_cons(5);
+
+		_summaryComp.setLastWeek_cons(15);
+		_summaryComp.set_weekly_cons(8);
+
+		_summaryComp.setLastMonth_cons(43);
+		_summaryComp.set_monthly_cons(33);
 		
 		_summaryComp.requestRender();
 //		changeComparisonBoxes(_compDay,_compWeek,_compMonth,Math.round(percent_day*10)/10,Math.round(percent_week*10)/10,Math.round(percent_month*10)/10);
@@ -829,7 +850,7 @@ public class PowerMeterMobileActivity extends Activity implements Observer {
 				e.printStackTrace();
 			}
 			Log.i(MODULE, "Running !!!");
-			_comp.requestRender();
+			_summaryWidget.requestRender();
 			_summaryComp.requestRender();
 		}
 	}
